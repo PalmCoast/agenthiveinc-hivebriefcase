@@ -1,0 +1,6 @@
+{
+  "_comment": "Maintainable compatibility facts. Update here instead of hard-coding model/version strings across the site.",
+  "runtime": "Node.js 18+ (standard library only, no external dependencies)",
+  "platform": "Claude Code (skills format)",
+  "note": "Skills are plain files. They run anywhere Node.js runs and are used by Claude via the Claude Code skills directory."
+}

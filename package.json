@@ -1,0 +1,25 @@
+{
+  "name": "claudefarm-storefront",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ClaudeFarm — real, tested Claude Code skills you can run before you buy.",
+  "type": "commonjs",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build": "node scripts/build-products.js",
+    "verify-product": "node scripts/verify-product.js",
+    "prestart": "node scripts/build-products.js",
+    "pretest": "node scripts/build-products.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.0",
+    "express": "^4.21.2",
+    "stripe": "^17.5.0"
+  }
+}

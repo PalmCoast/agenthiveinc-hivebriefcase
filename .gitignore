@@ -8,3 +8,6 @@ npm-debug.log*
 # Generated release artifacts + runtime data
 dist/
 data/
+
+# Local screen recordings (kept out of the repo; uploaded as PR artifacts)
+recordings/

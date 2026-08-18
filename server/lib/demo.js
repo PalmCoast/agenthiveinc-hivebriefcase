@@ -1,16 +1,14 @@
 'use strict';
 
-const path = require('path');
-const { ROOT } = require('./catalog');
-
 /**
  * Runs the real free "budget" skill in-process (no shell) and returns the
  * exact terminal output a customer would get after downloading it. This is the
  * proof engine for the homepage live demo.
+ *
+ * Static require so bundlers (esbuild on Netlify) include the skill in the
+ * function; this is the same source file that ships in the free download.
  */
-const budgetPath = path.join(ROOT, 'products', 'free-budget', 'scripts', 'budget.js');
-// eslint-disable-next-line import/no-dynamic-require
-const budget = require(budgetPath);
+const budget = require('../../products/free-budget/scripts/budget.js');
 
 const MAX_INPUT = 400;
 

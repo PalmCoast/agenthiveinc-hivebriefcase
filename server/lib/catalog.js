@@ -45,6 +45,12 @@ function resolveStore(store) {
   return { ...store, supportEmail };
 }
 
+/** Whether a manifest entry's artifact exists at runtime (relFile is authoritative). */
+function artifactExists(built) {
+  const abs = built.relFile ? path.join(ROOT, built.relFile) : built.file;
+  return Boolean(abs && fs.existsSync(abs));
+}
+
 /** Products merged with build manifest (version, checksum, verification, artifact). */
 function getProducts() {
   const raw = loadRaw();
@@ -59,7 +65,7 @@ function getProducts() {
       checksum: built ? built.checksum : null,
       artifactBytes: built ? built.bytes : null,
       verification: built ? built.verification : null,
-      hasArtifact: Boolean(built && built.file && fs.existsSync(built.file))
+      hasArtifact: Boolean(built && artifactExists(built))
     };
   });
 }

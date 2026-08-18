@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { getProduct, loadManifest } = require('./catalog');
+const { getProduct, loadManifest, ROOT } = require('./catalog');
 const tokens = require('./tokens');
 
 /**
@@ -15,8 +15,12 @@ function artifactFor(productId) {
   const manifest = loadManifest();
   if (!manifest || !manifest.products || !manifest.products[productId]) return null;
   const entry = manifest.products[productId];
-  if (!entry.file || !fs.existsSync(entry.file)) return null;
-  return entry;
+  // Resolve by repo-relative path against the runtime root. The manifest may
+  // store a build-time absolute `file` that does not exist in a bundled
+  // serverless function, so `relFile` is authoritative.
+  const abs = entry.relFile ? path.join(ROOT, entry.relFile) : entry.file;
+  if (!abs || !fs.existsSync(abs)) return null;
+  return { ...entry, file: abs };
 }
 
 function issueDownloadToken(productId) {

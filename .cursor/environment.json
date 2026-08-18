@@ -1,0 +1,11 @@
+{
+  "name": "ClaudeFarm storefront",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "storefront",
+      "command": "npm start"
+    }
+  ],
+  "ports": [3000]
+}

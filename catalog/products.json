@@ -1,0 +1,146 @@
+{
+  "currency": "usd",
+  "store": {
+    "name": "ClaudeFarm",
+    "domain": "claudefarm.example",
+    "supportEmail": "SUPPORT_EMAIL",
+    "refundPolicy": "14-day refund on request if a product does not install or run as documented. Email support with your order id.",
+    "disclaimer": "ClaudeFarm is an independent product and is not affiliated with, endorsed by, or sponsored by Anthropic. \"Claude\" is a trademark of Anthropic, PBC."
+  },
+  "products": [
+    {
+      "id": "free-budget",
+      "slug": "budget",
+      "tier": "free",
+      "name": "Budget Skill",
+      "tagline": "The free skill you can run right now.",
+      "priceCents": 0,
+      "sourceDir": "products/free-budget",
+      "oneLiner": "Turns a messy description of income and spending into a clean, repeatable monthly budget using the 50/30/20 framework.",
+      "audience": "Anyone using Claude who wants a budgeting workflow that returns the same structured result every time.",
+      "problem": "Ask Claude to budget twice and you get two different formats. This skill makes the workflow deterministic.",
+      "workflow": "Type your numbers, get income, categorized needs vs. wants, a 50/30/20 check, and exactly how much is left to save.",
+      "demoCommand": "budget",
+      "firstRun": "node scripts/budget.js \"income 5000 rent 1500 groceries 500\"",
+      "receives": [
+        "scripts/budget.js — the runnable skill (no dependencies)",
+        "SKILL.md — Claude Code skill definition",
+        "README.md — install + usage"
+      ],
+      "installSteps": [
+        "Download and unzip",
+        "Copy the budget folder into your Claude Code skills directory",
+        "Run the verify command to confirm it works",
+        "Ask Claude to run the budget skill"
+      ],
+      "updates": "Free forever. Re-download any time for the latest version.",
+      "cta": "Download the free skill",
+      "upgradeTo": "context-cookbook",
+      "seo": {
+        "title": "Free Claude Budget Skill — run it before you download | ClaudeFarm",
+        "description": "A free, reusable Claude Code skill that turns messy money notes into a clean 50/30/20 monthly budget. Run it live in your browser, then download it."
+      }
+    },
+    {
+      "id": "context-cookbook",
+      "slug": "context-cookbook",
+      "tier": "entry",
+      "name": "1M Context Cookbook",
+      "tagline": "Reliable workflows for huge documents.",
+      "priceCents": 1900,
+      "sourceDir": "products/context-cookbook",
+      "oneLiner": "Recipes and skills for feeding huge documents to Claude without losing structure or citations.",
+      "audience": "People who paste large reports, transcripts, or codebases into Claude and get truncated or ungrounded answers.",
+      "problem": "Long inputs get cut mid-sentence and citations drift. This ships the plumbing that keeps long-context work faithful.",
+      "workflow": "Chunk a document on real boundaries, build a stable citation index, then follow the map-reduce and grounded-Q&A recipes.",
+      "firstRun": "node scripts/chunk.js ./big-report.txt",
+      "receives": [
+        "scripts/chunk.js — boundary-aware chunking with overlap",
+        "scripts/cite.js — stable line citation index",
+        "recipes/map-reduce-summary.md — summarize oversized documents",
+        "recipes/citation-qa.md — grounded Q&A with real citations",
+        "SKILL.md + README.md"
+      ],
+      "installSteps": [
+        "Download and unzip",
+        "Copy the context-cookbook folder into your Claude Code skills directory",
+        "Verify with: node scripts/chunk.js",
+        "Follow a recipe in recipes/"
+      ],
+      "updates": "Lifetime updates: every future revision of these recipes and scripts is included with your one-time purchase.",
+      "cta": "Get the Cookbook — $19",
+      "upgradeTo": "skill-farmers-toolkit",
+      "seo": {
+        "title": "1M Context Cookbook — long-context Claude workflows | ClaudeFarm",
+        "description": "Boundary-aware chunking and stable citations for feeding huge documents to Claude. Tested scripts plus repeatable recipes. One-time $19, lifetime updates."
+      }
+    },
+    {
+      "id": "skill-farmers-toolkit",
+      "slug": "skill-farmers-toolkit",
+      "tier": "pro",
+      "name": "Skill Farmer's Toolkit",
+      "tagline": "Build and ship reliable Claude skills.",
+      "priceCents": 2900,
+      "sourceDir": "products/skill-farmers-toolkit",
+      "oneLiner": "Tools for building reliable Claude skills fast — scaffold a valid skill and lint it before you ship.",
+      "audience": "Builders creating multiple Claude skills who want every one to start tested and consistent.",
+      "problem": "Hand-built skills fail on someone else's machine because of a missing file or bad frontmatter. This catches that first.",
+      "workflow": "Scaffold a new skill from the tested template, then lint it to confirm frontmatter and entry files are valid before shipping.",
+      "firstRun": "node scripts/scaffold.js \"invoice parser\"",
+      "receives": [
+        "scripts/scaffold.js — generate a valid skill (SKILL.md + entry)",
+        "scripts/lint-skill.js — validate frontmatter + entry before shipping",
+        "SKILL.md + README.md"
+      ],
+      "installSteps": [
+        "Download and unzip",
+        "Copy the skill-farmers-toolkit folder into your Claude Code skills directory",
+        "Verify with: node scripts/scaffold.js",
+        "Scaffold your first skill"
+      ],
+      "updates": "Lifetime updates included with your one-time purchase.",
+      "cta": "Get the Toolkit — $29",
+      "upgradeTo": "whole-farm",
+      "seo": {
+        "title": "Skill Farmer's Toolkit — build reliable Claude skills | ClaudeFarm",
+        "description": "Scaffold and lint Claude Code skills so they work on the first install. Tested tools, one-time $29, lifetime updates."
+      }
+    },
+    {
+      "id": "whole-farm",
+      "slug": "whole-farm",
+      "tier": "complete",
+      "name": "The Whole Farm",
+      "tagline": "Everything ClaudeFarm makes — one purchase.",
+      "priceCents": 9900,
+      "version": "1.0.0",
+      "bundleOf": ["free-budget", "context-cookbook", "skill-farmers-toolkit"],
+      "oneLiner": "Every ClaudeFarm skill and toolkit in one download, plus everything added in the future.",
+      "audience": "Teams and power users who want the full library and every future release without buying piecemeal.",
+      "problem": "Buying skills one at a time is slow and you miss new releases. The Whole Farm is the complete, always-current library.",
+      "workflow": "Install any skill you need today; new skills land in your next download at no extra cost.",
+      "firstRun": "node free-budget/scripts/budget.js \"income 5000 rent 1500\"",
+      "receives": [
+        "Budget Skill (free tier)",
+        "1M Context Cookbook (entry tier)",
+        "Skill Farmer's Toolkit (pro tier)",
+        "Every skill ClaudeFarm ships in the future",
+        "One combined, verified download"
+      ],
+      "installSteps": [
+        "Download and unzip",
+        "Copy the folders you want into your Claude Code skills directory",
+        "Verify any skill with its listed verify command",
+        "Start with the skill that solves today's problem"
+      ],
+      "updates": "Lifetime updates across the entire library. Every future skill is included.",
+      "cta": "Harvest the Whole Farm — $99",
+      "upgradeTo": null,
+      "seo": {
+        "title": "The Whole Farm — every Claude skill ClaudeFarm makes | ClaudeFarm",
+        "description": "The complete ClaudeFarm library in one verified download, plus every future release. One-time $99, lifetime updates."
+      }
+    }
+  ]
+}

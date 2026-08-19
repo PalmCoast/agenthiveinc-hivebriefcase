@@ -12,8 +12,16 @@ function canonicalFor(path) {
   return (SITE.baseUrl || '') + (path || '/');
 }
 
+function ogImageUrl() {
+  return (SITE.baseUrl || '') + '/og.png';
+}
+
 function layout({ title, description, path, jsonLd, ogType }, body) {
   const canonical = canonicalFor(path);
+  const image = ogImageUrl();
+  const jsonLdBlocks = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
+    .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
+    .join('');
   const head = [
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
@@ -25,12 +33,17 @@ function layout({ title, description, path, jsonLd, ogType }, body) {
     `<meta property="og:description" content="${attr(description)}">`,
     `<meta property="og:site_name" content="${attr(SITE.name)}">`,
     canonical ? `<meta property="og:url" content="${attr(canonical)}">` : '',
+    `<meta property="og:image" content="${attr(image)}">`,
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:alt" content="${attr(SITE.name + ' — ' + SITE.tagline)}">`,
     '<meta name="twitter:card" content="summary_large_image">',
     `<meta name="twitter:title" content="${attr(title)}">`,
     `<meta name="twitter:description" content="${attr(description)}">`,
+    `<meta name="twitter:image" content="${attr(image)}">`,
     '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
     '<link rel="stylesheet" href="/styles.css">',
-    jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ''
+    jsonLdBlocks
   ];
   return `<!doctype html>
 <html lang="en">
@@ -196,16 +209,31 @@ function homePage(products) {
 
   const trust = trustSection();
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    itemListElement: ladder.map((p, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      url: canonicalFor('/p/' + p.slug),
-      name: p.name
-    }))
-  };
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'ClaudeFarm',
+      description: 'Independent maker of tested, versioned Claude Code skills.',
+      ...(SITE.baseUrl ? { url: SITE.baseUrl, logo: SITE.baseUrl + '/og.png' } : {})
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'ClaudeFarm',
+      ...(SITE.baseUrl ? { url: SITE.baseUrl } : {})
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: ladder.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: canonicalFor('/p/' + p.slug),
+        name: p.name
+      }))
+    }
+  ];
 
   return layout(
     {

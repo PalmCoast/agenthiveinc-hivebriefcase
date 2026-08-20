@@ -3,7 +3,25 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.resolve(__dirname, '..', '..');
+// Resolve the app root robustly so this works both as a normal Node process
+// and inside a bundled serverless function (where __dirname differs). Honors an
+// explicit APP_ROOT override, then walks up looking for catalog/products.json.
+function resolveRoot() {
+  if (process.env.APP_ROOT && fs.existsSync(process.env.APP_ROOT)) return process.env.APP_ROOT;
+  const candidates = [path.resolve(__dirname, '..', '..'), process.cwd()];
+  for (const start of candidates) {
+    let dir = start;
+    for (let i = 0; i < 8; i++) {
+      if (fs.existsSync(path.join(dir, 'catalog', 'products.json'))) return dir;
+      const parent = path.dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  }
+  return path.resolve(__dirname, '..', '..');
+}
+
+const ROOT = resolveRoot();
 const CATALOG_PATH = path.join(ROOT, 'catalog', 'products.json');
 const MANIFEST_PATH = path.join(ROOT, 'dist', 'manifest.json');
 
@@ -27,6 +45,12 @@ function resolveStore(store) {
   return { ...store, supportEmail };
 }
 
+/** Whether a manifest entry's artifact exists at runtime (relFile is authoritative). */
+function artifactExists(built) {
+  const abs = built.relFile ? path.join(ROOT, built.relFile) : built.file;
+  return Boolean(abs && fs.existsSync(abs));
+}
+
 /** Products merged with build manifest (version, checksum, verification, artifact). */
 function getProducts() {
   const raw = loadRaw();
@@ -41,7 +65,7 @@ function getProducts() {
       checksum: built ? built.checksum : null,
       artifactBytes: built ? built.bytes : null,
       verification: built ? built.verification : null,
-      hasArtifact: Boolean(built && built.file && fs.existsSync(built.file))
+      hasArtifact: Boolean(built && artifactExists(built))
     };
   });
 }

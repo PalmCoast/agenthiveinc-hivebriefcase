@@ -119,6 +119,29 @@ test('core navigation, sitemap and robots respond', async () => {
   assert.equal((await fetch(srv.base + '/totally-missing', { headers: { Accept: 'text/html' } })).status, 404);
 });
 
+test('SEO guides render and are in the sitemap', async () => {
+  const index = await fetch(srv.base + '/guides');
+  assert.equal(index.status, 200);
+  assert.match(await index.text(), /Guides/);
+
+  const guide = await fetch(srv.base + '/guides/install-claude-code-skills');
+  assert.equal(guide.status, 200);
+  const html = await guide.text();
+  assert.match(html, /How to install a Claude Code skill/);
+  assert.match(html, /application\/ld\+json/); // Article + Breadcrumb schema
+  assert.match(html, /\/p\/budget/); // internal link to a product
+
+  assert.equal((await fetch(srv.base + '/guides/nope')).status, 404);
+  assert.match(await (await fetch(srv.base + '/sitemap.xml')).text(), /\/guides\/1m-context-workflows/);
+});
+
+test('pages expose an Open Graph share image (per-product on product pages)', async () => {
+  const home = await (await fetch(srv.base + '/')).text();
+  assert.match(home, /property="og:image"[^>]*\/og\.png/);
+  const product = await (await fetch(srv.base + '/p/context-cookbook')).text();
+  assert.match(product, /property="og:image"[^>]*\/og\/context-cookbook\.png/);
+});
+
 test('analytics endpoint accepts allowlisted events and rejects others', async () => {
   const ok = await fetch(srv.base + '/api/events', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },

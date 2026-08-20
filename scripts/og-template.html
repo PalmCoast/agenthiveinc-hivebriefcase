@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1200px 630px at 80% -10%, #143d28 0%, #0f1a14 55%);
+    color: #eafff2;
+    padding: 72px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand svg { width: 54px; height: 54px; }
+  .brand .name { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; }
+  .brand .name b { color: #4ade80; }
+  .headline { font-size: 82px; line-height: 1.03; font-weight: 800; letter-spacing: -2px; max-width: 1000px; }
+  .headline .accent { color: #4ade80; }
+  .sub { font-size: 30px; color: #a7d8bd; margin-top: 26px; font-weight: 500; max-width: 940px; }
+  .footer { display: flex; align-items: center; gap: 20px; }
+  .pill { font-size: 26px; font-weight: 600; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.35); color: #bff4d3; padding: 12px 22px; border-radius: 999px; }
+  .verify { font-size: 26px; font-weight: 700; color: #0f1a14; background: #4ade80; padding: 12px 22px; border-radius: 999px; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="14" fill="#0b130f"/>
+      <path d="M32 48c0-11 7-17 17-19-2 13-9 19-17 19z" fill="#4ade80"/>
+      <path d="M32 48c0-9-6-14-15-16 2 11 8 16 15 16z" fill="#22c55e"/>
+      <rect x="30" y="30" width="4" height="18" rx="2" fill="#166534"/>
+    </svg>
+    <div class="name">Claude<b>Farm</b></div>
+  </div>
+
+  <div>
+    <div class="headline">Real Claude skills.<br><span class="accent">Test them before you buy.</span></div>
+    <div class="sub">Run a free skill live in your browser — then install it. Tested, versioned, lifetime updates.</div>
+  </div>
+
+  <div class="footer">
+    <div class="pill">claudefarm-skills-7e53.netlify.app</div>
+    <div class="verify">✓ Verified before shipping</div>
+  </div>
+</body>
+</html>

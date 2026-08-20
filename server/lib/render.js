@@ -16,9 +16,9 @@ function ogImageUrl() {
   return (SITE.baseUrl || '') + '/og.png';
 }
 
-function layout({ title, description, path, jsonLd, ogType }, body) {
+function layout({ title, description, path, jsonLd, ogType, image }, body) {
   const canonical = canonicalFor(path);
-  const image = ogImageUrl();
+  const ogImage = image ? (SITE.baseUrl || '') + image : ogImageUrl();
   const jsonLdBlocks = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
     .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
     .join('');
@@ -33,14 +33,14 @@ function layout({ title, description, path, jsonLd, ogType }, body) {
     `<meta property="og:description" content="${attr(description)}">`,
     `<meta property="og:site_name" content="${attr(SITE.name)}">`,
     canonical ? `<meta property="og:url" content="${attr(canonical)}">` : '',
-    `<meta property="og:image" content="${attr(image)}">`,
+    `<meta property="og:image" content="${attr(ogImage)}">`,
     '<meta property="og:image:width" content="1200">',
     '<meta property="og:image:height" content="630">',
     `<meta property="og:image:alt" content="${attr(SITE.name + ' — ' + SITE.tagline)}">`,
     '<meta name="twitter:card" content="summary_large_image">',
     `<meta name="twitter:title" content="${attr(title)}">`,
     `<meta name="twitter:description" content="${attr(description)}">`,
-    `<meta name="twitter:image" content="${attr(image)}">`,
+    `<meta name="twitter:image" content="${attr(ogImage)}">`,
     '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
     '<link rel="stylesheet" href="/styles.css">',
     jsonLdBlocks
@@ -74,6 +74,7 @@ function header(path) {
     <nav class="nav" aria-label="Primary">
       ${link('/products', 'Products')}
       ${link('/quiz', 'Find your skill')}
+      ${link('/guides', 'Guides')}
       ${link('/#demo', 'Live demo')}
       ${link('/trust', 'Trust')}
     </nav>
@@ -94,6 +95,7 @@ function footer() {
     <nav aria-label="Footer">
       <a href="/products">Products</a>
       <a href="/quiz">Find your skill</a>
+      <a href="/guides">Guides</a>
       <a href="/trust">Trust &amp; refunds</a>
       <a href="/#demo">Live demo</a>
     </nav>
@@ -347,6 +349,12 @@ function productPage(product, all, opts = {}) {
         ${cta}
       </div>
       <p class="muted small">${isFree ? 'Free download — no account needed.' : 'One-time purchase · lifetime updates · instant download.'}</p>
+      <ul class="reassure" aria-label="Why it's safe to buy">
+        ${product.verification ? `<li>${product.verification.status === 'PASS' ? '✓ Verified: PASS before shipping' : 'Verification: ' + esc(product.verification.status)}</li>` : ''}
+        <li>✓ Exact files &amp; version shown below</li>
+        ${isFree ? '<li>✓ Runs on Node 18+, no dependencies</li>' : '<li>✓ Lifetime updates included</li>'}
+        <li>✓ <a href="/trust">Refund policy &amp; support</a></li>
+      </ul>
       ${demoLink}
     </div>
     <aside class="ph-side">
@@ -402,6 +410,7 @@ function productPage(product, all, opts = {}) {
       description: product.seo.description,
       path: '/p/' + product.slug,
       ogType: 'product',
+      image: '/og/' + product.slug + '.png',
       jsonLd
     },
     body
@@ -454,6 +463,74 @@ function successPage({ product, downloadUrl, mock }) {
   );
 }
 
+function guidesIndexPage(guides) {
+  const cards = guides.map((g) => `<article class="card">
+    <h3><a href="/guides/${attr(g.slug)}">${esc(g.title)}</a></h3>
+    <p class="muted">${esc(g.description)}</p>
+    <div class="card-actions"><a class="btn btn-ghost" href="/guides/${attr(g.slug)}">Read the guide →</a></div>
+  </article>`).join('');
+  return layout(
+    {
+      title: 'Guides — installing and building Claude Code skills | ClaudeFarm',
+      description: 'Practical, free guides for Claude users: installing Claude Code skills, reliable 1M-context workflows, and building skills that work on the first install.',
+      path: '/guides'
+    },
+    `<section class="page-head"><div class="wrap">
+      <h1 class="section-title">Guides</h1>
+      <p class="section-sub muted">Free, practical guides for getting real work done with Claude Code skills.</p>
+    </div></section>
+    <section class="ladder"><div class="wrap"><div class="card-grid">${cards}</div></div></section>`
+  );
+}
+
+function guidePage(guide, products) {
+  const related = (guide.related || [])
+    .map((id) => products.find((p) => p.id === id))
+    .filter(Boolean);
+  const relatedHtml = related.length
+    ? `<section class="prod-section alt"><div class="wrap narrow">
+        <h2>Get the tools from this guide</h2>
+        <div class="card-grid">${related.map((p) => productCard(p, { featured: p.id === 'whole-farm' })).join('')}</div>
+      </div></section>`
+    : '';
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: guide.title,
+      description: guide.description,
+      dateModified: guide.updated,
+      author: { '@type': 'Organization', name: 'ClaudeFarm' },
+      ...(SITE.baseUrl ? { url: canonicalFor('/guides/' + guide.slug) } : {})
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Guides', item: canonicalFor('/guides') },
+        { '@type': 'ListItem', position: 2, name: guide.title, item: canonicalFor('/guides/' + guide.slug) }
+      ]
+    }
+  ];
+  return layout(
+    {
+      title: `${guide.title} | ClaudeFarm`,
+      description: guide.description,
+      path: '/guides/' + guide.slug,
+      ogType: 'article',
+      jsonLd
+    },
+    `<article>
+      <section class="page-head"><div class="wrap narrow">
+        <p class="muted small"><a href="/guides">Guides</a> · updated ${esc(guide.updated)}</p>
+        <h1 class="section-title">${esc(guide.title)}</h1>
+      </div></section>
+      <section class="prod-section"><div class="wrap narrow guide-body">${guide.bodyHtml}</div></section>
+      ${relatedHtml}
+    </article>`
+  );
+}
+
 function legalPage() {
   return layout(
     {
@@ -487,5 +564,7 @@ module.exports = {
   quizPage,
   successPage,
   legalPage,
+  guidesIndexPage,
+  guidePage,
   errorPage
 };

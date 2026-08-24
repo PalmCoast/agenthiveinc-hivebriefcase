@@ -196,9 +196,9 @@ export default function Welcome() {
   const [showInstall, setShowInstall] = useState(false);
 
   usePageMeta({
-    title: "SideQuest — Find your people to game, study & connect",
+    title: "SideQuest — Find your people to game with, in real life",
     description:
-      "SideQuest helps gamers and nerds find nearby people to game, study, and connect with. Send a SideQuest, unlock the mutual match, and meet up safely at verified Nest events. Free to start.",
+      "SideQuest is a find-your-people app for gamers, tabletop players, and nerds to meet nearby people in person. Send a SideQuest — chat unlocks only on a mutual match — and meet up safely at verified Nest events. Free to start, no card.",
     path: "/welcome",
   });
 
@@ -256,16 +256,20 @@ export default function Welcome() {
   ];
 
   const proofPoints = [
-    "Mutual-match only — connections are opt-in on both sides",
-    "Interest & distance based Signals, not endless swiping",
-    "Verified, in-person Nest events in public venues",
-    "Works on any phone as an installable app — no store needed",
+    "Mutual-match only — chat opens when both people opt in, so no one-sided DMs",
+    "First meetups happen at verified Nest events in public venues, never solo",
+    "Free to try — 3 SideQuests with no credit card, and Premium is a flat $4.99/mo you can cancel anytime",
+    "Built by an independent maker and funded by a simple subscription — not ads. What you see is what you get",
   ];
 
   const faqs = [
     {
+      q: "Who is SideQuest for?",
+      a: "Anyone who'd rather find their people in person than scroll alone — gamers, tabletop and board-game players, TTRPG groups, cosplayers, students, and nerds of every stripe looking for others nearby to actually hang out with.",
+    },
+    {
       q: "How much does SideQuest cost?",
-      a: "SideQuest is free to start with 3 SideQuests. Premium is $4.99/mo for unlimited SideQuests plus extra perks. Cancel anytime.",
+      a: "SideQuest is free to start with 3 SideQuests and no credit card. Premium is $4.99/mo for unlimited SideQuests plus extra perks. Cancel anytime.",
     },
     {
       q: "Is SideQuest a dating app?",
@@ -283,6 +287,10 @@ export default function Welcome() {
       q: "What's a \"Nest\"?",
       a: "A Nest is a safe, verified group meetup — think board-game café nights, arcade meetups, or library study sessions — where you meet your matches in person for the first time.",
     },
+    {
+      q: "Who's behind SideQuest?",
+      a: "SideQuest is built by an independent maker, funded by a simple subscription rather than ads. We're new and honest about it — no inflated user counts, no fake reviews. The proof is in how the app is built to keep meetups mutual and safe.",
+    },
   ];
 
   return (
@@ -299,28 +307,43 @@ export default function Welcome() {
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
           <div className="text-center lg:text-left">
+            {/* WHO IT'S FOR — a concrete audience, right up top */}
             <span className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/10 px-3 py-1 text-xs font-medium text-cyan mb-5">
-              <Sparkles size={14} /> Find your people — in real life
+              <Sparkles size={14} /> For gamers, tabletop players &amp; nerds
             </span>
+
+            {/* WHAT IT IS — one clear line, no jargon */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
-              Meet the people
+              Find your people to
               <br />
               <span className="bg-gradient-to-r from-purple to-cyan bg-clip-text text-transparent">
-                worth leaving the couch for.
+                game with — in real life.
               </span>
             </h1>
             <p className="mt-5 text-lg text-gray-300 max-w-xl mx-auto lg:mx-0">
-              SideQuest helps gamers and nerds discover nearby people to game, study, and connect
-              with. Send a SideQuest, unlock the mutual match, and meet up safely at verified Nest
-              events.
+              SideQuest is a find‑your‑people app that helps you meet nearby gamers, tabletop
+              players, and nerds in person. Send someone a SideQuest — chat only unlocks when
+              they send one back.
             </p>
 
+            {/* WHAT CHANGES — the before → after, at a glance */}
+            <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 text-sm">
+              <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1.5 text-gray-400 line-through decoration-gray-600">
+                Scrolling alone tonight
+              </span>
+              <ArrowRight size={16} className="text-cyan shrink-0" />
+              <span className="rounded-full bg-cyan/10 border border-cyan/30 px-3 py-1.5 text-cyan font-medium">
+                A real table of people nearby
+              </span>
+            </div>
+
+            {/* WHAT TO DO NEXT — one obvious primary action */}
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
               <button
                 onClick={getApp}
                 className="bg-gradient-to-r from-purple to-cyan text-white font-semibold rounded-full px-7 py-3.5 text-base active:scale-95 transition shadow-lg shadow-purple/20 flex items-center justify-center gap-2"
               >
-                <Zap size={18} /> Get the app
+                <Zap size={18} /> Get the app — free
               </button>
               <button
                 onClick={scrollTo("how")}
@@ -331,9 +354,9 @@ export default function Welcome() {
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-400">
-              <span className="flex items-center gap-1.5"><Check size={15} className="text-cyan" /> Free to start · 3 SideQuests</span>
+              <span className="flex items-center gap-1.5"><Check size={15} className="text-cyan" /> Free to start · 3 SideQuests, no card</span>
+              <span className="flex items-center gap-1.5"><Check size={15} className="text-cyan" /> Mutual match only</span>
               <span className="flex items-center gap-1.5"><Check size={15} className="text-cyan" /> Verified Nest meetups</span>
-              <span className="flex items-center gap-1.5"><Check size={15} className="text-cyan" /> No app store needed</span>
             </div>
           </div>
 
@@ -415,8 +438,8 @@ export default function Welcome() {
               </span>
             </h2>
             <p className="mt-3 text-gray-400">
-              Meeting strangers online is the #1 worry for social apps. We designed SideQuest around
-              it from day one.
+              Meeting someone new shouldn't feel risky. SideQuest is designed around that worry —
+              here's exactly how it's built to keep first meetups safe.
             </p>
           </div>
 
@@ -460,16 +483,16 @@ export default function Welcome() {
             />
           </div>
           <div>
-            <Eyebrow>Why it works</Eyebrow>
+            <Eyebrow>Why you can trust it</Eyebrow>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Real connections,{" "}
+              No hype — just how{" "}
               <span className="bg-gradient-to-r from-purple to-cyan bg-clip-text text-transparent">
-                not another feed
+                it actually works
               </span>
             </h2>
             <p className="mt-3 text-gray-400 max-w-lg">
-              SideQuest is built for the moment you actually meet up — the high-five, the shared
-              win, the "same time next week?"
+              We're new, so we won't throw fake numbers at you. Here's the honest case for
+              SideQuest — the way it's built to earn your trust.
             </p>
             <ul className="mt-6 space-y-3">
               {proofPoints.map((p) => (
@@ -532,7 +555,7 @@ export default function Welcome() {
             {/* Premium */}
             <div className="relative bg-gradient-to-b from-purple/15 to-cyan/10 border border-cyan/40 rounded-3xl p-7 flex flex-col shadow-xl shadow-purple/10">
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple to-cyan text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Most popular
+                Best value
               </span>
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <Zap size={18} className="text-cyan" /> Premium

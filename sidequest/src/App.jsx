@@ -3,11 +3,14 @@ import {
   Routes,
   Route,
   Link,
+  Navigate,
   useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
 import { createContext, useContext, useEffect, useState } from "react";
+import Welcome from "./Welcome.jsx";
+import { usePageMeta } from "./seo.js";
 // NOTE: the lucide `Home` icon and the "Home" page below would collide, so the
 // icon is aliased to HomeIcon.
 import {
@@ -100,6 +103,8 @@ function Toast({ message, onDone }) {
 // ── Nav ───────────────────────────────────────────────────────────────────────
 function Navbar() {
   const { pathname } = useLocation();
+  // The marketing landing has its own navigation; hide the app tab bar there.
+  if (pathname === "/welcome") return null;
   const tabs = [
     { to: "/", label: "Signals", Icon: HomeIcon },
     { to: "/nest", label: "Nest", Icon: Compass },
@@ -140,11 +145,40 @@ function PageHeader({ title, subtitle, right }) {
   );
 }
 
+// ── Root gate ─────────────────────────────────────────────────────────────────
+// First-time visitors on the web see the marketing landing; once they've entered
+// the app (or launched the installed PWA in standalone mode) they go straight to
+// the Signals list. The PWA start_url stays "/" so installs open cleanly.
+function isStandalone() {
+  return (
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function RootGate() {
+  const seen = (() => {
+    try {
+      return localStorage.getItem("sq_seen_welcome") === "1";
+    } catch {
+      return false;
+    }
+  })();
+  if (!seen && !isStandalone()) return <Navigate to="/welcome" replace />;
+  return <Signals />;
+}
+
 // ── Signals (home) ────────────────────────────────────────────────────────────
 function Signals() {
   const { premium, signalsLeft, spendSignal, addSent } = usePremium();
   const navigate = useNavigate();
   const [toast, setToast] = useState("");
+  usePageMeta({
+    title: "SideQuest — Signals nearby",
+    description:
+      "Browse nearby players, students, and creators open to team up. Send a SideQuest and unlock the mutual match.",
+    path: "/",
+  });
 
   const handleSideQuest = (name) => {
     if (!premium && signalsLeft <= 0) {
@@ -315,6 +349,12 @@ function Upgrade() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [status, setStatus] = useState("idle"); // idle | processing | success | error
+  usePageMeta({
+    title: "SideQuest Premium — unlimited SideQuests for $4.99/mo",
+    description:
+      "Go Premium for unlimited SideQuests, priority Nest spots, and more. Secure Stripe checkout, cancel anytime.",
+    path: "/upgrade",
+  });
 
   const perks = [
     "Unlimited SideQuests",
@@ -485,7 +525,8 @@ export default function App() {
     <PremiumProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Signals />} />
+          <Route path="/welcome" element={<Welcome />} />
+          <Route path="/" element={<RootGate />} />
           <Route path="/nest" element={<Nest />} />
           <Route path="/log" element={<Log />} />
           <Route path="/profile" element={<Profile />} />

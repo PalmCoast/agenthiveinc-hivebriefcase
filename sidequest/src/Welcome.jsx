@@ -16,6 +16,9 @@ import {
   Radar,
   Menu,
   X,
+  BadgeCheck,
+  Tent,
+  Eye,
 } from "lucide-react";
 import { useInstall } from "./useInstall.js";
 import { usePageMeta } from "./seo.js";
@@ -258,7 +261,7 @@ export default function Welcome() {
   const proofPoints = [
     "Mutual-match only — chat opens when both people opt in, so no one-sided DMs",
     "First meetups happen at verified Nest events in public venues, never solo",
-    "Free to try — 3 SideQuests with no credit card, and Premium is a flat $4.99/mo you can cancel anytime",
+    "Free to try — 3 SideQuests with no credit card; Premium is a founder rate of $2.49/mo (standard $4.99) you can cancel anytime",
     "Built by an independent maker and funded by a simple subscription — not ads. What you see is what you get",
   ];
 
@@ -269,7 +272,7 @@ export default function Welcome() {
     },
     {
       q: "How much does SideQuest cost?",
-      a: "SideQuest is free to start with 3 SideQuests and no credit card. Premium is $4.99/mo for unlimited SideQuests plus extra perks. Cancel anytime.",
+      a: "SideQuest is free to start with 3 SideQuests and no credit card. Premium is currently a founder / launch rate of $2.49/mo (standard $4.99/mo) and gives you a verified badge, the ability to host your own Nest meetups, seeing who SideQuested you first, plus priority and unlimited SideQuests. Cancel anytime.",
     },
     {
       q: "Is SideQuest a dating app?",
@@ -516,17 +519,17 @@ export default function Welcome() {
       <section id="premium" className="py-16 sm:py-24 bg-white/[0.02] border-y border-white/5 scroll-mt-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <Eyebrow>Pricing</Eyebrow>
+            <Eyebrow>Premium</Eyebrow>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Start free. Go{" "}
+              Get{" "}
               <span className="bg-gradient-to-r from-purple to-cyan bg-clip-text text-transparent">
-                Premium
+                verified
               </span>{" "}
-              when you're hooked.
+              and host your own people.
             </h2>
             <p className="mt-3 text-gray-400">
-              Everyone gets 3 free SideQuests. Premium unlocks unlimited — for less than a coffee a
-              month.
+              Free gets you started. Premium is about trust and access — a verified badge, the power
+              to host your own safe Nest meetups, and seeing who's already into meeting you.
             </p>
           </div>
 
@@ -555,23 +558,29 @@ export default function Welcome() {
             {/* Premium */}
             <div className="relative bg-gradient-to-b from-purple/15 to-cyan/10 border border-cyan/40 rounded-3xl p-7 flex flex-col shadow-xl shadow-purple/10">
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple to-cyan text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Best value
+                Founder rate
               </span>
               <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Zap size={18} className="text-cyan" /> Premium
+                <BadgeCheck size={18} className="text-cyan" /> Premium
               </h3>
-              <div className="mt-3 text-4xl font-extrabold">
-                $4.99<span className="text-base text-gray-400 font-normal">/mo</span>
+              <div className="mt-3 flex items-end gap-2">
+                <div className="text-4xl font-extrabold">
+                  $2.49<span className="text-base text-gray-400 font-normal">/mo</span>
+                </div>
+                <span className="text-sm text-gray-500 line-through mb-1.5">$4.99/mo</span>
               </div>
+              <p className="mt-1 text-xs text-cyan/90 font-medium">
+                Founder / launch pricing — lock in the early-member rate.
+              </p>
               <ul className="mt-6 space-y-3 text-sm flex-1">
                 {[
-                  "Unlimited SideQuests",
-                  "See who signalled you first",
-                  "Priority spots at Nest events",
-                  "Premium adventurer badge",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-3">
-                    <Check size={16} className="text-cyan shrink-0" /> {f}
+                  { Icon: BadgeCheck, label: "Verified badge — a trust signal on your profile" },
+                  { Icon: Tent, label: "Host your own verified, safe Nest meetups" },
+                  { Icon: Eye, label: "See who SideQuested you first" },
+                  { Icon: Zap, label: "Priority spots + unlimited SideQuests" },
+                ].map(({ Icon, label }) => (
+                  <li key={label} className="flex items-start gap-3">
+                    <Icon size={16} className="text-cyan shrink-0 mt-0.5" /> {label}
                   </li>
                 ))}
               </ul>
@@ -579,10 +588,10 @@ export default function Welcome() {
                 onClick={goUpgrade}
                 className="mt-7 w-full bg-gradient-to-r from-purple to-cyan text-white rounded-full py-3 font-semibold active:scale-[.99] transition flex items-center justify-center gap-2"
               >
-                Start Premium <ArrowRight size={16} />
+                Become a founding member <ArrowRight size={16} />
               </button>
               <p className="text-center text-xs text-gray-500 mt-3">
-                Secure Stripe checkout · cancel anytime
+                Secure Stripe checkout · $2.49/mo · cancel anytime
               </p>
             </div>
           </div>

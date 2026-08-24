@@ -25,6 +25,10 @@ import {
   MapPin,
   Check,
   ArrowLeft,
+  BadgeCheck,
+  Tent,
+  Eye,
+  Sparkles,
 } from "lucide-react";
 
 // ── Stripe ────────────────────────────────────────────────────────────────────
@@ -195,7 +199,9 @@ function Signals() {
       <div className="flex items-center justify-between mb-1 pt-2">
         <img src="/wordmark.svg" alt="SideQuest" className="h-8" width="180" height="32" />
         {premium ? (
-          <span className="text-xs font-semibold text-navy bg-cyan px-2.5 py-1 rounded-full">PREMIUM</span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-navy bg-cyan px-2.5 py-1 rounded-full">
+            <BadgeCheck size={13} /> VERIFIED
+          </span>
         ) : (
           <span className="text-sm text-cyan font-medium">{signalsLeft} free left</span>
         )}
@@ -228,7 +234,7 @@ function Signals() {
           onClick={() => navigate("/upgrade")}
           className="w-full mt-2 border border-purple/40 text-purple hover:bg-purple/10 rounded-2xl py-3 text-sm font-medium transition flex items-center justify-center gap-2"
         >
-          <Zap size={16} /> Go Premium for unlimited SideQuests
+          <BadgeCheck size={16} /> Go Premium — get verified &amp; host your own Nest
         </button>
       )}
 
@@ -307,22 +313,36 @@ function Profile() {
       <PageHeader title="Profile" subtitle="Your adventurer" />
 
       <div className="bg-navy/60 border border-cyan/20 rounded-2xl p-5 mb-4 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple to-cyan flex items-center justify-center text-xl font-bold">
+        <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple to-cyan flex items-center justify-center text-xl font-bold">
           Y
+          {premium && (
+            <BadgeCheck
+              size={22}
+              className="absolute -bottom-1 -right-1 text-cyan bg-navy rounded-full"
+              aria-label="Verified"
+            />
+          )}
         </div>
         <div>
-          <h3 className="font-semibold text-lg">You</h3>
+          <h3 className="font-semibold text-lg flex items-center gap-1.5">
+            You
+            {premium && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-navy bg-cyan px-2 py-0.5 rounded-full">
+                <BadgeCheck size={12} /> Verified
+              </span>
+            )}
+          </h3>
           <p className="text-sm text-cyan">Level 4 Adventurer</p>
           <p className="text-xs text-gray-400 mt-1">
-            {premium ? "Premium member" : "Free tier"}
+            {premium ? "Founding Premium member" : "Free tier"}
           </p>
         </div>
       </div>
 
       {premium ? (
         <div className="bg-cyan/10 border border-cyan/30 rounded-2xl p-4 flex items-center gap-3">
-          <Check className="text-cyan" size={20} />
-          <p className="text-sm">Premium active — unlimited SideQuests unlocked.</p>
+          <BadgeCheck className="text-cyan shrink-0" size={20} />
+          <p className="text-sm">Verified Premium — badge, Nest hosting &amp; full access unlocked.</p>
         </div>
       ) : (
         <button
@@ -345,22 +365,43 @@ function Profile() {
 
 // ── Upgrade (payment gate) ────────────────────────────────────────────────────
 function Upgrade() {
-  const { premium, setPremium } = usePremium();
+  const { premium, setPremium, signalsLeft } = usePremium();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [status, setStatus] = useState("idle"); // idle | processing | success | error
+  // Someone who arrives here having spent all 3 free SideQuests hit the paywall.
+  // Sell them on identity/safety/access, not just "you're out of quests."
+  const hitLimit = !premium && signalsLeft <= 0;
   usePageMeta({
-    title: "SideQuest Premium — unlimited SideQuests for $4.99/mo",
+    title: "SideQuest Premium — get verified, host a Nest, and see who's into you",
     description:
-      "Go Premium for unlimited SideQuests, priority Nest spots, and more. Secure Stripe checkout, cancel anytime.",
+      "Premium gives you a verified badge, the power to host your own safe Nest meetups, and to see who SideQuested you first — plus priority + unlimited SideQuests. Founder rate $2.49/mo, cancel anytime.",
     path: "/upgrade",
   });
 
+  // Repositioned around identity, safety, and access — the things an early member
+  // actually values. "Unlimited" stays, but as a secondary perk.
   const perks = [
-    "Unlimited SideQuests",
-    "See who signalled you first",
-    "Priority spots at Nest events",
-    "Premium adventurer badge",
+    {
+      Icon: BadgeCheck,
+      title: "Verified badge",
+      desc: "A trust signal on your profile so people know you're real before they meet you.",
+    },
+    {
+      Icon: Tent,
+      title: "Host your own Nest",
+      desc: "Create and run your own verified, safe in-person meetups — don't just attend, gather your people.",
+    },
+    {
+      Icon: Eye,
+      title: "See who SideQuested you first",
+      desc: "Know who's already into meeting you, so you never miss a mutual match.",
+    },
+    {
+      Icon: Zap,
+      title: "Priority + unlimited",
+      desc: "Priority spots at Nest events and unlimited SideQuests, so you're never held back.",
+    },
   ];
 
   // Returning from Stripe hosted checkout: verify the session server-side
@@ -427,9 +468,11 @@ function Upgrade() {
       <div className="p-4 pb-28 max-w-md mx-auto">
         <BackLink navigate={navigate} />
         <div className="bg-cyan/10 border border-cyan/30 rounded-2xl p-6 text-center">
-          <Check className="mx-auto text-cyan mb-3" size={32} />
-          <h2 className="text-xl font-bold">You're already Premium</h2>
-          <p className="text-sm text-gray-300 mt-2">Unlimited SideQuests are unlocked.</p>
+          <BadgeCheck className="mx-auto text-cyan mb-3" size={32} />
+          <h2 className="text-xl font-bold">You're a verified Premium member</h2>
+          <p className="text-sm text-gray-300 mt-2">
+            Your badge, Nest hosting, and full access are unlocked.
+          </p>
         </div>
       </div>
     );
@@ -439,9 +482,12 @@ function Upgrade() {
     return (
       <div className="p-4 pb-28 max-w-md mx-auto">
         <div className="bg-cyan/10 border border-cyan/30 rounded-2xl p-6 text-center">
-          <Check className="mx-auto text-cyan mb-3" size={36} />
-          <h2 className="text-2xl font-bold">Welcome to Premium!</h2>
-          <p className="text-sm text-gray-300 mt-2">Unlimited SideQuests are now unlocked.</p>
+          <BadgeCheck className="mx-auto text-cyan mb-3" size={36} />
+          <h2 className="text-2xl font-bold">Welcome, founding member!</h2>
+          <p className="text-sm text-gray-300 mt-2">
+            You're verified. Host a Nest, see who SideQuested you first, and enjoy priority +
+            unlimited access.
+          </p>
           <button
             onClick={() => navigate("/")}
             className="mt-5 bg-purple hover:bg-purple/80 text-white rounded-full px-6 py-2.5 font-medium transition"
@@ -457,20 +503,46 @@ function Upgrade() {
     <div className="p-4 pb-28 max-w-md mx-auto">
       <BackLink navigate={navigate} />
 
+      {hitLimit && (
+        <div className="bg-purple/10 border border-purple/30 rounded-2xl p-4 mb-6">
+          <h2 className="font-semibold flex items-center gap-2">
+            <BadgeCheck size={18} className="text-cyan shrink-0" /> Ready to be someone people trust?
+          </h2>
+          <p className="text-sm text-gray-300 mt-1.5">
+            You've used your 3 free SideQuests. Premium isn't just more quests — get verified, host
+            your own safe Nest meetups, and see who already SideQuested you.
+          </p>
+        </div>
+      )}
+
       <div className="text-center mb-6">
         <div className="inline-flex items-center gap-2 text-purple font-semibold mb-2">
-          <Zap size={18} /> SideQuest Premium
+          <BadgeCheck size={18} /> SideQuest Premium
         </div>
-        <div className="text-4xl font-bold">
-          $4.99<span className="text-base text-gray-400 font-normal">/mo</span>
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan/30 bg-cyan/10 px-3 py-1 text-xs font-medium text-cyan mb-3">
+          <Sparkles size={13} /> Founder / launch pricing
         </div>
+        <div className="flex items-end justify-center gap-2">
+          <div className="text-4xl font-bold">
+            $2.49<span className="text-base text-gray-400 font-normal">/mo</span>
+          </div>
+          <span className="text-sm text-gray-500 line-through mb-1.5">$4.99/mo</span>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          Lock in the early-member rate — it stays yours as long as you're subscribed.
+        </p>
       </div>
 
-      <div className="bg-navy/60 border border-cyan/20 rounded-2xl p-5 mb-6">
-        {perks.map((perk) => (
-          <div key={perk} className="flex items-center gap-3 py-2">
-            <Check size={18} className="text-cyan shrink-0" />
-            <span className="text-sm">{perk}</span>
+      <div className="bg-navy/60 border border-cyan/20 rounded-2xl p-5 mb-6 space-y-4">
+        {perks.map(({ Icon, title, desc }) => (
+          <div key={title} className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center shrink-0">
+              <Icon size={18} className="text-cyan" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold">{title}</h3>
+              <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -491,7 +563,7 @@ function Upgrade() {
       </button>
 
       <p className="text-center text-xs text-gray-500 mt-3">
-        Secure subscription checkout via Stripe · cancel anytime.
+        Secure Stripe checkout · founder rate $2.49/mo · cancel anytime.
       </p>
     </div>
   );

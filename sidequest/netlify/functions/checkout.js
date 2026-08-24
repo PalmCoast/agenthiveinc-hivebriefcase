@@ -1,9 +1,17 @@
 import Stripe from "stripe";
 
+// SideQuest Premium pricing (cents/mo). Founder is the discounted early-member
+// rate that early sign-ups lock in; STANDARD documents the regular list price the
+// founder rate is measured against. The checkout button charges FOUNDER, so the
+// UI must show $2.49/mo as the amount actually billed.
+const FOUNDER_PRICE_CENTS = 249;
+const STANDARD_PRICE_CENTS = 499;
+
 /**
- * Creates a Stripe Checkout Session for SideQuest Premium ($4.99/mo) using the
- * server-side restricted secret key (STRIPE_SECRET_KEY). The browser never sees
- * the key — it only receives the returned session URL to redirect to.
+ * Creates a Stripe Checkout Session for SideQuest Premium — founder / launch
+ * rate ($2.49/mo) — using the server-side restricted secret key
+ * (STRIPE_SECRET_KEY). The browser never sees the key; it only receives the
+ * returned session URL to redirect to.
  */
 export default async (req) => {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -21,12 +29,21 @@ export default async (req) => {
           quantity: 1,
           price_data: {
             currency: "usd",
-            unit_amount: 499,
+            unit_amount: FOUNDER_PRICE_CENTS,
             recurring: { interval: "month" },
-            product_data: { name: "SideQuest Premium" },
+            product_data: {
+              name: "SideQuest Premium — Founder rate",
+              description:
+                "Early-member founder pricing: verified badge, host your own Nest, see who SideQuested you first, priority + unlimited SideQuests.",
+            },
           },
         },
       ],
+      metadata: {
+        plan: "premium_founder",
+        founder_price_cents: String(FOUNDER_PRICE_CENTS),
+        standard_price_cents: String(STANDARD_PRICE_CENTS),
+      },
       success_url: `${origin}/upgrade?success=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/upgrade?canceled=1`,
     });

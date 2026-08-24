@@ -158,17 +158,15 @@ function Signals() {
 
   return (
     <div className="p-4 pb-28 max-w-md mx-auto">
-      <PageHeader
-        title="SideQuest"
-        subtitle="Nearby players ready to team up"
-        right={
-          premium ? (
-            <span className="text-xs font-semibold text-navy bg-cyan px-2.5 py-1 rounded-full">PREMIUM</span>
-          ) : (
-            <span className="text-sm text-cyan font-medium">{signalsLeft} free left</span>
-          )
-        }
-      />
+      <div className="flex items-center justify-between mb-1 pt-2">
+        <img src="/wordmark.svg" alt="SideQuest" className="h-8" width="180" height="32" />
+        {premium ? (
+          <span className="text-xs font-semibold text-navy bg-cyan px-2.5 py-1 rounded-full">PREMIUM</span>
+        ) : (
+          <span className="text-sm text-cyan font-medium">{signalsLeft} free left</span>
+        )}
+      </div>
+      <p className="text-sm text-gray-400 mb-6">Nearby players ready to team up</p>
 
       {mockProfiles.map((p) => (
         <div

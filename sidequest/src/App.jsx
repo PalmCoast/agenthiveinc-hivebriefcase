@@ -5,9 +5,9 @@ import {
   Link,
   useLocation,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 import { createContext, useContext, useEffect, useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
 // NOTE: the lucide `Home` icon and the "Home" page below would collide, so the
 // icon is aliased to HomeIcon.
 import {
@@ -24,15 +24,12 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// ── Stripe (demo) ────────────────────────────────────────────────────────────
-// A real upgrade needs a backend to create a Stripe Checkout Session, then
-// `stripe.redirectToCheckout({ sessionId })`. Without a key + backend we run a
-// clearly-labeled demo flow. Set VITE_STRIPE_PUBLISHABLE_KEY to wire real Stripe.
-const STRIPE_CONFIGURED = Boolean(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-// Only call loadStripe with a real key — loadStripe("") throws an IntegrationError.
-const stripePromise = STRIPE_CONFIGURED
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
-  : null;
+// ── Stripe ────────────────────────────────────────────────────────────────────
+// Checkout runs through a server-side Netlify function (netlify/functions/) that
+// holds the restricted secret key and creates a Stripe Checkout Session. The
+// browser only ever receives a redirect URL — the secret key never ships to the
+// client. On localhost with no backend, the Upgrade page falls back to a demo
+// unlock so `npm run dev` still works.
 const FREE_SIGNALS = 3;
 
 const mockProfiles = [
@@ -318,6 +315,7 @@ function Profile() {
 function Upgrade() {
   const { premium, setPremium } = usePremium();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [status, setStatus] = useState("idle"); // idle | processing | success | error
 
   const perks = [
@@ -327,20 +325,61 @@ function Upgrade() {
     "Premium adventurer badge",
   ];
 
+  // Returning from Stripe hosted checkout: verify the session server-side
+  // before unlocking premium.
+  useEffect(() => {
+    if (params.get("success") !== "1") return;
+    const sessionId = params.get("session_id");
+    (async () => {
+      setStatus("processing");
+      try {
+        const res = await fetch(`/api/verify?session_id=${encodeURIComponent(sessionId || "")}`);
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.paid) {
+          setPremium(true);
+          setStatus("success");
+        } else {
+          setStatus("error");
+        }
+      } catch {
+        setStatus("error");
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleUpgrade = async () => {
     setStatus("processing");
+    const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     try {
-      // Real flow: POST to your backend to create a Checkout Session, then
-      // `const stripe = await stripePromise; stripe.redirectToCheckout({ sessionId })`.
-      const stripe = stripePromise ? await stripePromise : null; // null in demo mode
-      if (stripe) {
-        // Placeholder for real redirect; no backend in this demo shell.
-        console.info("Stripe loaded; wire a backend Checkout Session to go live.");
+      // The backend creates the Checkout Session with the server-side secret
+      // key and returns its URL; redirect the browser to Stripe.
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
       }
-      await new Promise((r) => setTimeout(r, 900)); // simulate network
-      setPremium(true);
-      setStatus("success");
+      // No backend (e.g. plain `vite dev`) → local demo unlock only. Deployed
+      // builds always have the function, so this never grants premium for free.
+      if (isLocal) {
+        await new Promise((r) => setTimeout(r, 600));
+        setPremium(true);
+        setStatus("success");
+        return;
+      }
+      setStatus("error");
     } catch {
+      if (isLocal) {
+        await new Promise((r) => setTimeout(r, 600));
+        setPremium(true);
+        setStatus("success");
+        return;
+      }
       setStatus("error");
     }
   };
@@ -414,9 +453,7 @@ function Upgrade() {
       </button>
 
       <p className="text-center text-xs text-gray-500 mt-3">
-        {STRIPE_CONFIGURED
-          ? "Secure checkout via Stripe."
-          : "Demo checkout — no card charged. Set VITE_STRIPE_PUBLISHABLE_KEY for live Stripe."}
+        Secure subscription checkout via Stripe · cancel anytime.
       </p>
     </div>
   );

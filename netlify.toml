@@ -1,0 +1,20 @@
+[build]
+  # Build + verify all products so the deploy can never ship a stale/broken artifact.
+  command = "npm run build"
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  node_bundler = "esbuild"
+  # Ship the data the function reads at runtime (catalog + built artifacts).
+  included_files = ["catalog/**", "dist/**"]
+
+# Serve static assets from /public directly; everything else hits the Express app.
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  force = false

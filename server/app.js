@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 
 const catalog = require('./lib/catalog');
+const guides = require('./lib/guides');
 const render = require('./lib/render');
 const demo = require('./lib/demo');
 const checkout = require('./lib/checkout');
@@ -51,6 +52,22 @@ function createApp() {
 
   app.get('/trust', (req, res) => {
     res.type('html').send(render.legalPage());
+  });
+
+  app.get('/guides', (req, res) => {
+    res.type('html').send(render.guidesIndexPage(guides.getGuides()));
+  });
+
+  app.get('/guides/:slug', (req, res) => {
+    const guide = guides.getGuide(req.params.slug);
+    if (!guide) {
+      return res.status(404).type('html').send(render.errorPage({
+        code: 404, title: 'Guide not found',
+        message: 'That guide does not exist. Browse all guides instead.',
+        cta: '<a class="btn btn-primary" href="/guides">All guides</a>'
+      }));
+    }
+    res.type('html').send(render.guidePage(guide, catalog.getProducts()));
   });
 
   app.get('/p/:slug', (req, res) => {
@@ -174,7 +191,11 @@ function createApp() {
 
   app.get('/sitemap.xml', (req, res) => {
     const origin = originOf(req);
-    const urls = ['/', '/products', '/quiz', '/trust', ...catalog.getProducts().map((p) => `/p/${p.slug}`)];
+    const urls = [
+      '/', '/products', '/quiz', '/trust', '/guides',
+      ...catalog.getProducts().map((p) => `/p/${p.slug}`),
+      ...guides.getGuides().map((g) => `/guides/${g.slug}`)
+    ];
     const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
       .map((u) => `  <url><loc>${origin}${u}</loc></url>`)
       .join('\n')}\n</urlset>\n`;

@@ -12,5 +12,5 @@ data/
 # Local screen recordings (kept out of the repo; uploaded as PR artifacts)
 recordings/
 
-# Local Netlify folder
+# Netlify CLI local state
 .netlify

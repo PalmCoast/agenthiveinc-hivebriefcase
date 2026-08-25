@@ -13,4 +13,4 @@ data/
 recordings/
 
 # Netlify CLI local state
-.netlify/
+.netlify
